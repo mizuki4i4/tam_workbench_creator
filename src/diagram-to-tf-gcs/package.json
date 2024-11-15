@@ -1,0 +1,13 @@
+{
+    "name": "diagram-to-tf-gcs",
+    "version": "1.0.0",
+    "description": "Cloud Function to analyze images with Vertex AI",
+    "main": "index.js",
+    "scripts": {
+        "deploy": "gcloud functions deploy diagram-to-tf-gcs --runtime nodejs20 --trigger-event google.storage.object.finalize --trigger-resource tam-workbench-creator-upload-bucket --entry-point main --allow-unauthenticated --service-account=sa-mizuki-demo-joonix@mizuki-demo-joonix.iam.gserviceaccount.com"
+    },
+    "dependencies": {
+        "@google-cloud/storage": "^6.0.0",
+        "@google-cloud/vertexai": "^1.9.0"
+    }
+}
