@@ -184,7 +184,7 @@ exports.main = async (event, context) => {
     }
 
     // (4) ファイルを新しい内容で更新
-    const updateMessage = "Update Terraform code using VertexAI -> Upload file: ${filePath}";
+    const updateMessage = "Update Terraform code using VertexAI -> Upload file: ${filePath}-${Date.now()}";
     const contentEncoded = Buffer.from(finalTfCode).toString("base64");
 
     await octokit.repos.createOrUpdateFileContents({
