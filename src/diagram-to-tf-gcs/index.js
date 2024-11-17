@@ -73,6 +73,8 @@ exports.main = async (event, context) => {
     const formattingRequest = {
         text: `
         以下の作成済みのベースとなるTerraformのコードに構成図から生成したコードを追記してmain.tfを完成させて下さい
+        重要！アウトプットはソースコードのみを出力して下さい、お願いします。
+
         * プロジェクト名: mizuki-demo-joonix
         * リージョン: asia-northeast1
         
@@ -95,7 +97,7 @@ exports.main = async (event, context) => {
 
         resource "google_storage_bucket" "tam_workbench_creator" {
           name          = "tam-workbench-creator-upload-bucket"
-          project = "mizuki-demo-joonix" 
+          project = "mizuki-demo-joonix"
           location      = "asia-northeast1"
           storage_class = "STANDARD"
           force_destroy = true
@@ -121,7 +123,6 @@ exports.main = async (event, context) => {
 
     const cleanedTfCode = tfResponse.replace(/```terraform|```/g, '').trim();
     console.log('3rd response:',  cleanedTfCode);
-
 
 
     // GitHub設定
