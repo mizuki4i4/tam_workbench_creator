@@ -197,11 +197,14 @@ exports.main = async (event, context) => {
       branch: branchName,
     });
     console.log(`Upload file: ${filePath} in branch: ${branchName}`);
+    const fileLink = "https://storage.googleapis.com/tam-workbench-creator-upload-bucket//${fileName}";
+
 
     // (5) PRを作成
     const prTitle = "Update Terraform Code via Cloud Functions";
     const prBody = `This PR updates the Terraform configuration file
     [${fileUri}](${fileUri})
+    ![Image](${fileLink})
     `;
 
     const { data: prData } = await octokit.pulls.create({
