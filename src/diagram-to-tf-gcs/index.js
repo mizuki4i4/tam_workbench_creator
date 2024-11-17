@@ -117,28 +117,12 @@ exports.main = async (event, context) => {
     const streamingResult2 = await generativeVisionModel.generateContentStream(request2);
     const aggregatedResponse2 = await streamingResult2.response;
     const tfResponse = aggregatedResponse2.candidates[0].content.parts[0].text;
-
     console.log('2nd response:', tfResponse);
 
-    // Step 3: Finalizing the Terraform code
-    const createFileRequest = {
-        text: `
-        以下の作成済みのTerraformのコードmain.tfの本文を完成させて下さい。
-        ソースコードのアウトプットのみを行って下さい、コードの先頭や末尾に不要な修飾文字は入れないで下さい。
-        
-        ${tfResponse}
-        `,
-    };
+    const cleanedTfCode = tfResponse.replace(/```terraform|```/g, '').trim();
+    console.log('3rd response:',  cleanedTfCode);
 
-    const request3 = {
-      contents: [{ role: 'user', parts: [createFileRequest] }],
-    };
 
-    const streamingResult3 = await generativeVisionModel.generateContentStream(request3);
-    const aggregatedResponse3 = await streamingResult3.response;
-    const finalTfCode = aggregatedResponse3.candidates[0].content.parts[0].text;
-
-    console.log('3rd response:', finalTfCode);
 
     // GitHub設定
     const githubToken = process.env.GITHUB_TOKEN; // トークンを安全に保存してください
@@ -185,7 +169,7 @@ exports.main = async (event, context) => {
 
     // (4) ファイルを新しい内容で更新
     const updateMessage = "Update Terraform code using VertexAI -> Upload file: ${filePath}-${Date.now()}";
-    const contentEncoded = Buffer.from(finalTfCode).toString("base64");
+    const contentEncoded = Buffer.from(cleanedTfCode).toString("base64");
 
     await octokit.repos.createOrUpdateFileContents({
       owner,
@@ -197,14 +181,14 @@ exports.main = async (event, context) => {
       branch: branchName,
     });
     console.log(`Upload file: ${filePath} in branch: ${branchName}`);
-    const fileLink = "https://storage.googleapis.com/tam-workbench-creator-upload-bucket//${fileName}";
+    const fileLink = `https://storage.googleapis.com/tam-workbench-creator-upload-bucket/${fileName}`;
 
 
     // (5) PRを作成
-    const prTitle = "Update Terraform Code via Cloud Functions";
+    const prTitle = `Update Terraform code using VertexAI -> Upload file: ${filePath}-${Date.now()}`;
     const prBody = `This PR updates the Terraform configuration file
-    [${fileUri}](${fileUri})
-    ![Image](${fileLink})
+    ### FileLink
+    [${fileLink}](${fileLink})
     `;
 
     const { data: prData } = await octokit.pulls.create({

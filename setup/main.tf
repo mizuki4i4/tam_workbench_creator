@@ -16,7 +16,7 @@ terraform {
 
 resource "google_storage_bucket" "tam_workbench_creator" {
   name          = "tam-workbench-creator-upload-bucket"
-  project = "mizuki-demo-joonix" 
+  project = "mizuki-demo-joonix"
   location      = "asia-northeast1"
   storage_class = "STANDARD"
   force_destroy = true
