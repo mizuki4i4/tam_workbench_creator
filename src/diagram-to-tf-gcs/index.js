@@ -146,7 +146,7 @@ exports.main = async (event, context) => {
     const repo = "tam_workbech_creator"; // リポジトリ名
     const branchName = `update-terraform-${Date.now()}`; // 新しいブランチ名
     const baseBranch = "main"; // PRのベースとなるブランチ
-    const filePath = "./setup/main.tf"; // 更新するTerraformコードのファイルパス
+    const filePath = "setup/main.tf"; // 更新するTerraformコードのファイルパス
 
     // GitHubクライアントを初期化
     const octokit = new Octokit({ auth: githubToken });
@@ -184,7 +184,7 @@ exports.main = async (event, context) => {
     }
 
     // (4) ファイルを新しい内容で更新
-    const updateMessage = "Update Terraform code using Cloud Functions";
+    const updateMessage = "Update Terraform code using VertexAI -> Upload file: ${filePath}";
     const contentEncoded = Buffer.from(finalTfCode).toString("base64");
 
     await octokit.repos.createOrUpdateFileContents({
@@ -196,12 +196,12 @@ exports.main = async (event, context) => {
       sha: currentFileSha, // 既存ファイルがない場合は `undefined` のままでOK
       branch: branchName,
     });
-    console.log(`Updated file: ${filePath} in branch: ${branchName}`);
+    console.log(`Upload file: ${filePath} in branch: ${branchName}`);
 
     // (5) PRを作成
     const prTitle = "Update Terraform Code via Cloud Functions";
     const prBody = `This PR updates the Terraform configuration file
-    File URI: ${fileUri}
+    [${fileUri}](${fileUri})
     `;
 
     const { data: prData } = await octokit.pulls.create({
