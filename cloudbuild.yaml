@@ -35,7 +35,7 @@ steps:
   - |
       COMMENT=$(cat setup/plan_output.txt | jq -Rs .)
       curl -X POST -H "Content-Type: application/json" \
-        -d '{"body":"'"$COMMENT"'"}' \
+        -d '{"body":"test"}' \
         https://api.github.com/repos/mizuki4i4/${REPO_NAME}/issues/${_PR_NUMBER}/comments
 
 # ログオプションを追加
