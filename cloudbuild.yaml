@@ -9,20 +9,6 @@ steps:
       echo "Branch Name: $BRANCH_NAME"
       echo "***********************"
 
-- id: 'extract-pr-info'
-  name: 'alpine:3.18'
-  entrypoint: 'sh'
-  args:
-  - '-c'
-  - |
-      PR_NUMBER=$_PR_NUMBER
-      REPO_NAME=$_REPO_NAME
-      REPO_OWNER=$_REPO_OWNER
-
-      echo "PR_NUMBER=$PR_NUMBER" >> /workspace/env_vars
-      echo "REPO_NAME=$REPO_NAME" >> /workspace/env_vars
-      echo "REPO_OWNER=$REPO_OWNER" >> /workspace/env_vars
-
 - id: 'tf-init'
   name: 'hashicorp/terraform:1.5.6'
   entrypoint: 'sh'
@@ -49,12 +35,11 @@ steps:
   args:
   - '-c'
   - |
-      source /workspace/env_vars
       COMMENT=$(cat setup/plan_output.txt | jq -Rs .)
       curl -X POST -H "Authorization: Bearer $GITHUB_TOKEN" \
         -H "Content-Type: application/json" \
         -d "{\"body\":${COMMENT}}" \
-        https://api.github.com/repos/${_REPO_OWNER}/${_REPO_NAME}/issues/${_PR_NUMBER}/comments
+        https://api.github.com/repos/mizuki4i4/${REPO_NAME}/issues/${_PR_NUMBER}/comments
 
 # ログオプションを追加
 options:
