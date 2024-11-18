@@ -10,20 +10,15 @@ steps:
       echo "***********************"
 
 - id: 'extract-pr-info'
-  name: 'alpine:3.18' # Alpineイメージ
+  name: 'alpine:3.18'
   entrypoint: 'sh'
   args:
   - '-c'
   - |
-      apk add --no-cache jq
-      if [ ! -f /workspace/event.json ]; then
-          echo "Error: event.json not found."
-          exit 1
-      fi
-
-      PR_NUMBER=$(jq '.pull_request.number' /workspace/event.json)
-      REPO_NAME=$(jq -r '.repository.name' /workspace/event.json)
-      REPO_OWNER=$(jq -r '.repository.owner.login' /workspace/event.json)
+      # GitHub固有のデフォルト置換キーを使用
+      PR_NUMBER=$_PR_NUMBER
+      REPO_NAME=$_REPO_NAME
+      REPO_OWNER=$_REPO_OWNER
 
       echo "PR_NUMBER=$PR_NUMBER" >> /workspace/env_vars
       echo "REPO_NAME=$REPO_NAME" >> /workspace/env_vars
@@ -48,33 +43,19 @@ steps:
       terraform plan -out=plan_output.txt || { echo "Terraform plan failed"; exit 1; }
 
 - id: 'post-pr-comment'
-  name: 'alpine:3.18' # Alpineイメージ
+  name: 'alpine:3.18'
   entrypoint: 'sh'
   env:
     - 'GITHUB_TOKEN=${_GITHUB_TOKEN}'
   args:
   - '-c'
   - |
-      apk add --no-cache jq
-      if [ ! -f /workspace/env_vars ]; then
-          echo "Error: env_vars not found."
-          exit 1
-      fi
-
       source /workspace/env_vars
-      if [ ! -f setup/plan_output.txt ]; then
-          echo "Error: plan_output.txt not found."
-          exit 1
-      fi
-
       COMMENT=$(cat setup/plan_output.txt | jq -Rs .)
       curl -X POST -H "Authorization: Bearer $GITHUB_TOKEN" \
         -H "Content-Type: application/json" \
         -d "{\"body\":${COMMENT}}" \
-        https://api.github.com/repos/$REPO_OWNER/$REPO_NAME/issues/$PR_NUMBER/comments || {
-          echo "Failed to post PR comment."
-          exit 1
-      }
+        https://api.github.com/repos/${_REPO_OWNER}/${_REPO_NAME}/issues/${_PR_NUMBER}/comments
 
 # ログオプションを追加
 options:
