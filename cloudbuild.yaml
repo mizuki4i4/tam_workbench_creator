@@ -9,6 +9,22 @@ steps:
       echo "Branch Name: $BRANCH_NAME"
       echo "***********************"
 
+- id: 'extract-pr-info'
+  name: 'alpine'
+  entrypoint: 'sh'
+  args:
+  - '-c'
+  - |
+      # 必要な情報をevent.jsonから抽出
+      PR_NUMBER=$(jq '.pull_request.number' /workspace/event.json)
+      REPO_NAME=$(jq -r '.repository.name' /workspace/event.json)
+      REPO_OWNER=$(jq -r '.repository.owner.login' /workspace/event.json)
+
+      echo "PR_NUMBER=$PR_NUMBER" >> /workspace/env_vars
+      echo "REPO_NAME=$REPO_NAME" >> /workspace/env_vars
+      echo "REPO_OWNER=$REPO_OWNER" >> /workspace/env_vars
+
+
 - id: 'tf init'
   name: 'hashicorp/terraform:1.5.6' # 最新安定版のイメージ
   entrypoint: 'sh'
@@ -26,8 +42,23 @@ steps:
   - '-c'
   - | 
       cd setup
-      terraform plan || exit 1
+      terraform plan > plan_output.txt || exit 1
 # [END tf-plan]
+
+- id: 'post-pr-comment'
+  name: 'alpine'
+  entrypoint: 'sh'
+  env:
+    - 'GITHUB_TOKEN=${_GITHUB_TOKEN}'
+  args:
+  - '-c'
+  - |
+      source /workspace/env_vars
+      COMMENT=$(cat setup/plan_output.txt | jq -Rs .)
+      curl -X POST -H "Authorization: Bearer $GITHUB_TOKEN" \
+        -H "Content-Type: application/json" \
+        -d "{\"body\":${COMMENT}}" \
+        https://api.github.com/repos/$REPO_OWNER/$REPO_NAME/issues/$PR_NUMBER/comments
 
 # ログオプションを追加
 options:
