@@ -30,11 +30,12 @@ steps:
 - id: 'post-pr-comment'
   name: 'alpine:3.18'
   entrypoint: 'sh'
+  env:
+  - 'COMMENT=$(cat setup/plan_output.txt | jq -Rs .)'
   args:
   - '-c'
   - |
       apk add --no-cache jq curl
-      COMMENT=$(cat setup/plan_output.txt | jq -Rs .)
       curl -X POST -H "Content-Type: application/json" \
         -d '{"body":"'"$COMMENT"'"}' \
         https://api.github.com/repos/mizuki4i4/${REPO_NAME}/issues/${_PR_NUMBER}/comments
