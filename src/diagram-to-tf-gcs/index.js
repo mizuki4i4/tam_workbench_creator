@@ -5,7 +5,7 @@ const { Octokit } = require("@octokit/rest");
 exports.main = async (event, context) => {
   try {
     const file = event;
-    console.log("Works!!");
+    console.log("Works!!"+ event);
     if (!file.bucket || !file.name) {
       throw new Error('Invalid event payload: missing bucket or name');
     }
