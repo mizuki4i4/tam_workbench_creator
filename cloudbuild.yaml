@@ -15,7 +15,6 @@ steps:
   args:
   - '-c'
   - |
-      # GitHub固有のデフォルト置換キーを使用
       PR_NUMBER=$_PR_NUMBER
       REPO_NAME=$_REPO_NAME
       REPO_OWNER=$_REPO_OWNER
