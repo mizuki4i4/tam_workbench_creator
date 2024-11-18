@@ -33,9 +33,10 @@ steps:
   args:
   - '-c'
   - |
+      apk add --no-cache jq curl
       COMMENT=$(cat setup/plan_output.txt | jq -Rs .)
       curl -X POST -H "Content-Type: application/json" \
-        -d '{"body":"test"}' \
+        -d '{"body":"'"$COMMENT"'"}' \
         https://api.github.com/repos/mizuki4i4/${REPO_NAME}/issues/${_PR_NUMBER}/comments
 
 # ログオプションを追加
