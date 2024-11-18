@@ -1,4 +1,4 @@
-# tam_workbech_creator
+# tam_workbench_creator
 
 gcloud functions update diagram-to-tf-gcs \
     --region=asia-northeast1 \

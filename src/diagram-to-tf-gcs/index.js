@@ -128,7 +128,7 @@ exports.main = async (event, context) => {
     // GitHub設定
     const githubToken = process.env.GITHUB_TOKEN; // トークンを安全に保存してください
     const owner = "mizuki4i4"; // リポジトリの所有者
-    const repo = "tam_workbech_creator"; // リポジトリ名
+    const repo = "tam_workbench_creator"; // リポジトリ名
     const branchName = `update-terraform-${Date.now()}`; // 新しいブランチ名
     const baseBranch = "main"; // PRのベースとなるブランチ
     const filePath = "setup/main.tf"; // 更新するTerraformコードのファイルパス
