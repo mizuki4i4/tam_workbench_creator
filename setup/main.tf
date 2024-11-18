@@ -25,3 +25,28 @@ resource "google_storage_bucket" "tam_workbench_creator" {
     enabled = true
   }
 }
+
+resource "google_compute_instance" "vm_instance" {
+ project = "mizuki-demo-joonix"
+  zone  = "asia-northeast1-a" 
+  name = "vm1"
+  machine_type = "e2-standard"
+ network_interface {
+    network = "default"
+  }
+  boot_disk {
+    initialize_params {
+      image = "debian-cloud/debian-11" 
+    }
+  }
+}
+
+
+
+resource "google_storage_bucket" "default" {
+  project = "mizuki-demo-joonix"
+  location = "ASIA-NORTHEAST1"
+ name    = "mizuki-demo-joonix-gcs-bucket"
+ storage_class = "STANDARD"
+ uniform_bucket_level_access = true
+}
