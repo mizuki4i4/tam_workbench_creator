@@ -25,3 +25,27 @@ resource "google_storage_bucket" "tam_workbench_creator" {
     enabled = true
   }
 }
+
+resource "google_compute_instance" "vm_instance" {
+ project      = "mizuki-demo-joonix"
+  zone         = "asia-northeast1-a" #default zone
+  machine_type = "e2-standard-2"  #default machine type
+  name         = "vm1"
+ network_interface {
+    subnetwork = "projects/mizuki-demo-joonix/regions/asia-northeast1/subnetworks/default"
+  }
+
+  boot_disk {
+    initialize_params {
+      image = "debian-cloud/debian-11" #default image
+    }
+  }
+}
+
+
+resource "google_storage_bucket" "default" {
+ project = "mizuki-demo-joonix"
+  name                        = "mizuki-demo-joonix-gcs-bucket" # Provide a unique bucket name
+  location                    = "asia-northeast1" # Should be the same as the VM region
+ storage_class = "STANDARD"
+}
